@@ -1,0 +1,10 @@
+{
+  "database": {
+    "engine": "mysql",
+    "host": "db",
+    "name": "dbname",
+    "user": "dbuser",
+    "password": "dbpass",
+    "port": 3306
+  }
+}

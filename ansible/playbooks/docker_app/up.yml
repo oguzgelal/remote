@@ -1,0 +1,146 @@
+- hosts: dockerserver
+  remote_user: "SETREMOTEUSER"
+  become: 'yes'
+  become_method: sudo
+  gather_facts: 'yes'
+  vars:
+    PROJABSPATH: "SETPROJABSPATH"
+    SUDOUSER: "SETSUDOUSER"
+    DSDIR: "/var/docker-apps"
+    VMIP: ansible_host
+  tasks:
+
+  - debug: var=ansible_host
+
+  - name: Clean artifact path
+    file:
+      state: absent
+      path: "{{ DSDIR }}"
+
+  - file:
+      path: '{{ DSDIR }}'
+      state: directory
+      mode: 493
+
+  - name: Copy Docker apps
+    copy:
+      src: '{{PROJABSPATH}}/docker-apps/'
+      dest: '{{DSDIR}}/'
+      remote_src: no
+
+  - name: Install docker packages
+    become: yes
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    with_items:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg-agent
+      - curl
+      - software-properties-common
+    tags:
+      - docker
+    ignore_errors: yes
+
+  - name: Add Docker s official GPG key
+    become: yes
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+    tags:
+      - docker
+
+  - name: Verify that we have the key with the fingerprint
+    become: yes
+    apt_key:
+      id: 0EBFCD88
+      state: present
+    tags:
+      - docker
+
+  - name: Set up the stable repository
+    become: yes
+    apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+      update_cache: yes
+    tags:
+      - docker
+
+  - name: Update apt packages
+    become: yes
+    apt:
+      update_cache: yes
+    tags:
+      - docker
+    ignore_errors: yes
+
+  - name: Install docker
+    become: yes
+    apt:
+      name: docker-ce
+      state: present
+      update_cache: yes
+    #notify: Start docker on boot
+    tags:
+      - docker
+
+  - name: Add remote "ubuntu" user to "docker" group
+    become: yes
+    user:
+      name: "{{ SUDOUSER }}"
+      group: "docker"
+      append: yes
+    tags:
+      - docker
+
+  - name: Install docker-compose
+    become: yes
+    get_url: 
+      url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: 'u+x,g+x'
+
+  - name: Stop previous Docker-compose
+    shell:
+      cmd: 'docker-compose down'
+    args:
+      executable: /bin/bash
+      chdir: '{{DSDIR}}/'
+
+  - name: Run Docker-compose
+    shell:
+      cmd: 'docker-compose up --build -d'
+    args:
+      executable: /bin/bash
+      chdir: '{{DSDIR}}/'
+
+  - name: Add docker volume for portainer
+    shell:
+      cmd: 'docker volume create portainer_data'
+    args:
+      executable: /bin/bash
+      chdir: '{{DSDIR}}/'
+
+  - name: Add portainer
+    run_once: true
+    ignore_errors: yes
+    shell:
+      cmd: 'docker run -d -p 9000:9000 -p 8000:8000 --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer'
+    args:
+      executable: /bin/bash
+      chdir: '{{DSDIR}}/'
+
+  - name: Run Docker-compose Logs
+    shell:
+      cmd: 'docker-compose logs'
+    args:
+      executable: /bin/bash
+      chdir: '{{DSDIR}}/'
+    register: docker_compose_logs
+
+  - debug: var=docker_compose_logs.stdout_lines
+
+      

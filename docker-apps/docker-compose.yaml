@@ -1,0 +1,51 @@
+version: "2.1"
+services:
+
+  code-server:
+    image: linuxserver/code-server
+    container_name: code-server
+    env_file:
+      - .env
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${VAL_TZ}
+      - PASSWORD=${VAL_PASSWORD}
+      - SUDO_PASSWORD=${VAL_SUDO_PASSWORD}
+      - PROXY_DOMAIN=${VAL_PROXY_DOMAIN}
+    volumes:
+      - ./docker-data/csv/config:/config
+    ports:
+      - 8443:8443
+    restart: unless-stopped
+
+  nginx-proxy-man:
+    image: jc21/nginx-proxy-manager:2
+    restart: always
+    ports:
+      # Public HTTP Port:
+      - '80:80'
+      # Public HTTPS Port:
+      - '443:443'
+      # Admin Web Port:
+      - '81:81'
+    environment:
+      DISABLE_IPV6: 'true'
+    volumes:
+      # Make sure this config.json file exists as per instructions above:
+      - ./configs/nginx-manager-config.json:/app/config/production.json
+      - ./docker-data/nginx-man/data:/data
+      - ./certs:/etc/letsencrypt
+    depends_on:
+      - db
+
+  db:
+    build: ./mariadb-aria/.
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'newp455w0rd'
+      MYSQL_DATABASE: 'dbname'
+      MYSQL_USER: 'dbuser'
+      MYSQL_PASSWORD: 'dbpass'
+    volumes:
+      - ./docker-data/mysql:/var/lib/mysql
