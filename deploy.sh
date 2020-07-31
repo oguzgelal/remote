@@ -17,4 +17,4 @@ add-apt-repository \
    stable"
 
 # run ansible setup
-ansible-playbook ansible/setup.yml
+ansible-playbook ansible/setup.yml --extra-vars "cwd=${PWD}"
