@@ -4,9 +4,9 @@
   become: yes
   become_method: sudo
   gather_facts: yes
-  ansible_python_interpreter: /usr/bin/python3
-
+  
   vars:
+    ansible_python_interpreter: /usr/bin/python3
     PROJABSPATH: "SETPROJABSPATH"
     SUDOUSER: root
     DSDIR: /var/apps
