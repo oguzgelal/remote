@@ -11,4 +11,4 @@ apt-add-repository --yes --update ppa:ansible/ansible
 apt install ansible -y
 
 # run ansible setup
-ansible-playbook ansible/setup.yml --extra-vars "cwd=${PWD}"
+ansible-playbook setup.yml --extra-vars "cwd=${PWD}"
