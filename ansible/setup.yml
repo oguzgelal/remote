@@ -1,16 +1,17 @@
-- hosts: dockerserver
-  remote_user: "SETREMOTEUSER"
-  become: 'yes'
+- hosts: 127.0.0.1
+  connection: local
+  remote_user: root
+  become: yes
   become_method: sudo
-  gather_facts: 'yes'
+  gather_facts: yes
+  ansible_python_interpreter: /usr/bin/python3
+
   vars:
     PROJABSPATH: "SETPROJABSPATH"
-    SUDOUSER: "SETSUDOUSER"
-    DSDIR: "/var/docker-apps"
-    VMIP: ansible_host
+    SUDOUSER: root
+    DSDIR: /var/apps
+  
   tasks:
-
-  - debug: var=ansible_host
 
   - name: Clean artifact path
     file:
@@ -24,12 +25,11 @@
 
   - name: Copy Docker apps
     copy:
-      src: '{{PROJABSPATH}}/docker-apps/'
+      src: '{{PROJABSPATH}}/apps/'
       dest: '{{DSDIR}}/'
       remote_src: no
 
   - name: Install docker packages
-    become: yes
     apt:
       name: "{{ item }}"
       state: present
@@ -44,8 +44,7 @@
       - docker
     ignore_errors: yes
 
-  - name: Add Docker s official GPG key
-    become: yes
+  - name: Add Dockers official GPG key
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
@@ -53,7 +52,6 @@
       - docker
 
   - name: Verify that we have the key with the fingerprint
-    become: yes
     apt_key:
       id: 0EBFCD88
       state: present
@@ -61,7 +59,6 @@
       - docker
 
   - name: Set up the stable repository
-    become: yes
     apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
       state: present
@@ -70,7 +67,6 @@
       - docker
 
   - name: Update apt packages
-    become: yes
     apt:
       update_cache: yes
     tags:
@@ -78,7 +74,6 @@
     ignore_errors: yes
 
   - name: Install docker
-    become: yes
     apt:
       name: docker-ce
       state: present
@@ -88,7 +83,6 @@
       - docker
 
   - name: Add remote "ubuntu" user to "docker" group
-    become: yes
     user:
       name: "{{ SUDOUSER }}"
       group: "docker"
@@ -97,7 +91,6 @@
       - docker
 
   - name: Install docker-compose
-    become: yes
     get_url: 
       url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
       dest: /usr/local/bin/docker-compose

@@ -1,15 +1,16 @@
-* Create a new Server with Ubuntu 18.04 Image. Add ssh key and copy the ip to `ansible/inventories/hosts` file.
-* Also make sure to update this files as per your preference :
+### Setting up
 
- 1. `docker-apps/docker-compose.yaml`
+```bash
+# first SSH into the server
+ssh root@<server_ip>
 
-#### Initial Server setup
+# clone this repo into the root directory
+git clone https://github.com/oguzgelal/remote.git
+cd remote
 
-```sh
-$ ./init_server.sh
+# execute setup
+./deploy.sh
 ```
-
-Check the logs and Update your domain dns accordingly.
 
 #### Default nginx-proxy-manager password :
 
