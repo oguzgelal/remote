@@ -2,6 +2,9 @@
 
 apt update
 
+# receive PUB keys for docker
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7EA0A9C3F273FCD8
+
 # install python 3
 apt install python3-apt python-apt-common -y
 
@@ -9,12 +12,6 @@ apt install python3-apt python-apt-common -y
 apt install software-properties-common -y
 apt-add-repository --yes --update ppa:ansible/ansible
 apt install ansible -y
-
-# add docker repo
-add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
 
 # run ansible setup
 ansible-playbook ansible/setup.yml --extra-vars "cwd=${PWD}"

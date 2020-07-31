@@ -33,21 +33,6 @@
       dest: '{{ apps_path }}/'
       remote_src: no
 
-  - name: Install docker packages
-    apt:
-      name: '{{ item }}'
-      state: present
-      update_cache: yes
-    with_items:
-      - apt-transport-https
-      - ca-certificates
-      - gnupg-agent
-      - curl
-      - software-properties-common
-    tags:
-      - docker
-    ignore_errors: yes
-
   - name: Add Dockers official GPG key
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
@@ -59,6 +44,20 @@
     apt_key:
       id: 0EBFCD88
       state: present
+    tags:
+      - docker
+  
+  - name: Install docker packages
+    apt:
+      name: [
+        'apt-transport-https',
+        'ca-certificates',
+        'gnupg-agent',
+        'curl',
+        'software-properties-common'
+      ]
+      state: present
+      update_cache: yes
     tags:
       - docker
 
@@ -75,7 +74,6 @@
       update_cache: yes
     tags:
       - docker
-    ignore_errors: yes
 
   - name: Install docker
     apt:
@@ -122,7 +120,6 @@
 
   - name: Add portainer
     run_once: true
-    ignore_errors: yes
     shell:
       cmd: 'docker run -d -p 9000:9000 -p 8000:8000 --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer'
     args:
