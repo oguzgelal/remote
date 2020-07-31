@@ -37,59 +37,40 @@
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
-    tags:
-      - docker
-
-  - name: Verify that we have the key with the fingerprint
-    apt_key:
-      id: 0EBFCD88
-      state: present
-    tags:
-      - docker
   
   - name: Install docker packages
     apt:
       name: [
+        'software-properties-common',
         'apt-transport-https',
         'ca-certificates',
         'gnupg-agent',
         'curl',
-        'software-properties-common'
       ]
       state: present
       update_cache: yes
-    tags:
-      - docker
 
   - name: Set up the stable repository
     apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
       state: present
       update_cache: yes
-    tags:
-      - docker
 
   - name: Update apt packages
     apt:
       update_cache: yes
-    tags:
-      - docker
 
   - name: Install docker
     apt:
       name: docker-ce
       state: present
       update_cache: yes
-    tags:
-      - docker
 
   - name: Add remote 'ubuntu' user to 'docker' group
     user:
       name: '{{ sudo_user }}'
       group: 'docker'
       append: yes
-    tags:
-      - docker
 
   - name: Install docker-compose
     get_url: 
@@ -125,15 +106,5 @@
     args:
       executable: /bin/bash
       chdir: '{{ apps_path }}/'
-
-  - name: Run Docker-compose Logs
-    shell:
-      cmd: 'docker-compose logs'
-    args:
-      executable: /bin/bash
-      chdir: '{{ apps_path }}/'
-    register: docker_compose_logs
-
-  - debug: var=docker_compose_logs.stdout_lines
 
       
