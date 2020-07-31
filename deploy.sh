@@ -1,16 +1,20 @@
 #!/usr/bin/env bash
 
-PROJABSPATH=${PWD}
-
 apt update
-apt install software-properties-common python3-apt python-apt-common -yq
+
+# install python 3
+apt install python3-apt python-apt-common -y
+
+# install ansible
+apt install software-properties-common -y
 apt-add-repository --yes --update ppa:ansible/ansible
-apt install ansible -yq
-sudo add-apt-repository \
+apt install ansible -y
+
+# add docker repo
+add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
 
-sed -i "" -e "s+SETPROJABSPATH+$PROJABSPATH+g" ansible/setup.yml
-
+# run ansible setup
 ansible-playbook ansible/setup.yml

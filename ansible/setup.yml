@@ -6,32 +6,35 @@
   gather_facts: yes
   
   vars:
+    host_key_checking: False
+    roles_path: root
     ansible_python_interpreter: /usr/bin/python3
-    PROJABSPATH: "SETPROJABSPATH"
     SUDOUSER: root
-    DSDIR: /var/apps
+    CWD: /root
+    APPS: /var/apps
   
   tasks:
 
   - name: Clean artifact path
     file:
       state: absent
-      path: "{{ DSDIR }}"
+      path: '{{ APPS }}'
 
-  - file:
-      path: '{{ DSDIR }}'
+  - name: Create apps directory
+    file:
+      path: '{{ APPS }}'
       state: directory
       mode: 493
 
   - name: Copy Docker apps
     copy:
-      src: '{{PROJABSPATH}}/apps/'
-      dest: '{{DSDIR}}/'
+      src: '{{ CWD }}/apps/'
+      dest: '{{ APPS }}/'
       remote_src: no
 
   - name: Install docker packages
     apt:
-      name: "{{ item }}"
+      name: '{{ item }}'
       state: present
       update_cache: yes
     with_items:
@@ -78,14 +81,13 @@
       name: docker-ce
       state: present
       update_cache: yes
-    #notify: Start docker on boot
     tags:
       - docker
 
-  - name: Add remote "ubuntu" user to "docker" group
+  - name: Add remote 'ubuntu' user to 'docker' group
     user:
-      name: "{{ SUDOUSER }}"
-      group: "docker"
+      name: '{{ SUDOUSER }}'
+      group: 'docker'
       append: yes
     tags:
       - docker
@@ -101,21 +103,21 @@
       cmd: 'docker-compose down'
     args:
       executable: /bin/bash
-      chdir: '{{DSDIR}}/'
+      chdir: '{{ APPS }}/'
 
   - name: Run Docker-compose
     shell:
       cmd: 'docker-compose up --build -d'
     args:
       executable: /bin/bash
-      chdir: '{{DSDIR}}/'
+      chdir: '{{ APPS }}/'
 
   - name: Add docker volume for portainer
     shell:
       cmd: 'docker volume create portainer_data'
     args:
       executable: /bin/bash
-      chdir: '{{DSDIR}}/'
+      chdir: '{{ APPS }}/'
 
   - name: Add portainer
     run_once: true
@@ -124,14 +126,14 @@
       cmd: 'docker run -d -p 9000:9000 -p 8000:8000 --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer'
     args:
       executable: /bin/bash
-      chdir: '{{DSDIR}}/'
+      chdir: '{{ APPS }}/'
 
   - name: Run Docker-compose Logs
     shell:
       cmd: 'docker-compose logs'
     args:
       executable: /bin/bash
-      chdir: '{{DSDIR}}/'
+      chdir: '{{ APPS }}/'
     register: docker_compose_logs
 
   - debug: var=docker_compose_logs.stdout_lines
