@@ -12,9 +12,12 @@ cd remote
 ./deploy.sh
 ```
 
+#### TODO
+* zsh
+
 #### Default nginx-proxy-manager password :
 
 ```
-Email		:   admin@example.com
-password 	: 	changeme
+Email: admin@example.com
+Password: changeme
 ```
