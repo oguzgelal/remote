@@ -13,8 +13,8 @@ cd remote
 ```
 
 #### TODO
+* use dynamic rpid and pgid
 * zsh (setup it up in the container)
-* root permissions inside container
 
 #### Default nginx-proxy-manager password :
 
