@@ -5,12 +5,12 @@ services:
     image: linuxserver/code-server
     container_name: code-server
     env_file:
-      - .env
+      - ../.env
     environment:
       - PUID=0
       - PGID=999
       - TZ=Europe/London
-      - PASSWORD=${VAL_PASSWORD}
+      - PASSWORD=${VSCODE_PASSWORD}
     volumes:
       - ./docker-data/csv/config:/config
     ports:
@@ -27,7 +27,7 @@ services:
     environment:
       DISABLE_IPV6: 'true'
     volumes:
-      - ./configs/nginx-manager-config.json:/app/config/production.json
+      - ./nginx-proxy-manager/config.json:/app/config/production.json
       - ./docker-data/nginx-man/data:/data
       - ./certs:/etc/letsencrypt
     depends_on:

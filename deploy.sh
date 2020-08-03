@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-RUID=$(id -u root)
-RGID=$(id -g root)
-
 apt update
 
 # install python 3
@@ -14,4 +11,4 @@ apt-add-repository --yes --update ppa:ansible/ansible
 apt install ansible -y
 
 # run ansible setup
-ansible-playbook setup.yml --extra-vars "cwd=${PWD} ruid=${RUID} rgid=${RGID}"
+ansible-playbook setup.yml --extra-vars "cwd=${PWD}"
