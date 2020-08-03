@@ -9,10 +9,7 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=${VAL_TZ}
-      - PASSWORD=${VAL_PASSWORD}
-      - SUDO_PASSWORD=${VAL_SUDO_PASSWORD}
-      - PROXY_DOMAIN=${VAL_PROXY_DOMAIN}
+      - TZ=Europe/London
     volumes:
       - ./docker-data/csv/config:/config
     ports:
