@@ -10,6 +10,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
+      - PASSWORD=${VAL_PASSWORD}
     volumes:
       - ./docker-data/csv/config:/config
     ports:
