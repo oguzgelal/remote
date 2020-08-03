@@ -13,7 +13,7 @@ cd remote
 ```
 
 #### TODO
-* zsh
+* zsh (setup it up in the container)
 
 #### Default nginx-proxy-manager password :
 
