@@ -7,8 +7,8 @@ services:
     env_file:
       - .env
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=999
       - TZ=Europe/London
       - PASSWORD=${VAL_PASSWORD}
     volumes:
